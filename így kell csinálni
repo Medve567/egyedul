@@ -1,0 +1,201 @@
+a ### amiket kell bemásolni
+
+
+composer self-update
+
+###composer global remove laravel/installer
+
+###composer global update
+
+###composer global require laravel/installer
+
+mehet mindhárom parancs egyszerre, lefrissíti
+
+hozd létre az új projektet:
+
+laravel new laravel-12-rest-api
+
+amikor választani kell, hogy none, react, vue, livewire, válaszd a none-t.
+
+###none
+
+az adatbázisoknál a mysql-t
+
+###mysql
+
+állítsd be a .env fájlban az adatbázisod nevét
+
+###php artisan make:model Content --migration //másolásnál töröld vissza és írd be kézzel kötőjel-kötőjelmigration
+
+Content.php-t egészítsd ki, mert ha kimarad akkor a post tesztelés nem fog működni:
+
+
+
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+
+class Content extends Model
+{
+    ###protected $table = 'contents';
+
+    ###protected $fillable = ['title', 'body', 'img']; FONTOS!! ide azok kellenek, amik az adatbázisban szerepel
+
+    ###public $timestamps = false;
+}
+
+
+
+
+
+állítsd be a database/migrations-ben a táblád adatait
+
+$table->id();
+
+###$table->string('title'); FONTOS!! ide azok kellenek, amik az adatbázisban szerepel
+
+###$table->string('body'); FONTOS!! ide azok kellenek, amik az adatbázisban szerepel
+
+###$table->string('img'); FONTOS!! ide azok kellenek, amik az adatbázisban szerepel
+
+$table->timestamps();
+
+
+
+
+Jetstream helyett így tudjuk létrehozni az api.php-t:
+
+###php artisan install:api
+
+Controllert létrehozása:
+
+###php artisan make:controller ContentController --api //két kötőjel egymás után az api előtt, kézzel írd be
+
+
+
+ahol szükséges egészítsd ki:
+
+namespace App\Http\Controllers;
+
+###use App\Models\Content;
+
+use Illuminate\Http\Request;
+
+use App\Http\Controllers\Controller;
+
+
+
+ 
+
+class ContentController extends Controller
+
+{
+
+    public function index()
+
+    {
+
+        //return response()->json(Content::all());
+
+        ###$contents = Content::get();
+
+        ###return response()->json($contents);
+
+    }
+
+ 
+
+    public function store(Request $request)
+
+    {
+
+        /*$content = Content::create($request->only(['title', 'body', 'img']));
+
+        return response()->json($content, 201);*/
+
+ 
+
+        ###$content = new Content();
+
+        ###$content->title = $request->title;
+
+        ###$content->body = $request->body;
+
+        ###$content->img = $request->img;
+
+        ###$content->save();
+
+        ###return response()->json($content);
+
+    }
+
+ 
+
+    public function show(string $id)
+
+    {
+
+        ###$content = Content::findOrFail($id);
+
+        ###return response()->json($content);
+
+ 
+
+       
+
+    }
+
+ 
+
+    public function update(Request $request, string $id)
+
+    {
+
+        ###$content = Content::findOrFail($id);
+
+        ###$content->update($request->only(['title', 'body', 'img']));
+
+        ###return response()->json($content);
+
+    }
+
+ 
+
+    public function destroy(string $id)
+
+    {
+
+        ###Content::destroy($id);
+
+        ###return response()->json(['message' => 'Törölve']);
+
+    }
+
+}
+
+egészítsük ki az routes/api.php fájlunkat:
+
+use Illuminate\Http\Request;
+
+use Illuminate\Support\Facades\Route;
+
+###use App\Http\Controllers\ContentController;
+
+Route::get('/user', function (Request $request) {
+
+    return $request->user();
+
+})->middleware('auth:sanctum');
+
+###Route::apiResource('contents', ContentController::class);
+
+mehet a tesztelés:
+
+php artisan serve
+
+link /api/contents 
+
+
+
+php artisan route:list -> útvonalak végpontok
